@@ -21,6 +21,10 @@
 
 body {
     font-family: 'Roboto', sans-serif;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr;
+    gap: 20px;
     line-height: 1.6;
     color: var(--text-color);
     background-color: var(--light-bg);
