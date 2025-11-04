@@ -1,0 +1,140 @@
+/* Importação de Fonte */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+/* Variáveis de Cores */
+:root {
+    --primary-color: #007bff;      /* Azul principal */
+    --secondary-color: #28a745;    /* Verde para botões de destaque */
+    --text-color: #333;
+    --light-bg: #f8f9fa;           /* Fundo da página */
+    --white: #ffffff;
+    --dark-bg: #343a40;            /* Fundo para cabeçalho/rodapé */
+    --link-hover: #0056b3;
+}
+
+/* Reset Básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--light-bg);
+}
+
+/* Header e Navegação */
+header {
+    background-color: var(--dark-bg);
+    color: var(--white);
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+nav ul li {
+    margin-right: 25px;
+}
+
+nav ul li a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 400;
+    padding: 8px 10px;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: var(--primary-color);
+}
+
+/* Botão de Destaque (Doações) */
+.cta-button {
+    background-color: var(--secondary-color);
+    color: var(--white) !important;
+    border-radius: 5px;
+    padding: 8px 15px !important;
+    font-weight: 700 !important;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cta-button:hover {
+    background-color: #1e7e34; /* Tom mais escuro de verde */
+    transform: translateY(-2px);
+    color: var(--white) !important;
+}
+
+/* Conteúdo Principal */
+main {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    min-height: 70vh; /* Garante que o rodapé fique embaixo */
+}
+
+main h1 {
+    font-size: 2.5em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    border-bottom: 3px solid var(--secondary-color);
+    padding-bottom: 10px;
+}
+
+.content-section {
+    background-color: var(--white);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.content-section p {
+    margin-bottom: 15px;
+}
+
+/* Rodapé */
+footer {
+    background-color: var(--dark-bg);
+    color: var(--white);
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.9em;
+    width: 100%;
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav ul li {
+        margin: 5px 0;
+        width: 100%;
+    }
+
+    nav ul li a {
+        display: block;
+        padding: 10px 0;
+    }
+
+    .cta-button {
+        text-align: center;
+    }
+}
