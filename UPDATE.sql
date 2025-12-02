@@ -12,3 +12,4 @@ WHERE nome = 'Bruno Mendes';
 UPDATE Produto
 SET descricao = 'Camiseta de malha casual, listras em preto e branco'
 WHERE idProduto = 105;
+-- UPDATE 4: Atualizar quantidade em estoque do Produto ID 202 para 50 unidades

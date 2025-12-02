@@ -33,3 +33,4 @@ JOIN Cliente cli ON v.idCliente = cli.idCliente
 JOIN ItemVenda iv ON v.idVenda = iv.idVenda
 JOIN Produto p ON iv.idProduto = p.idProduto
 WHERE v.idVenda = 1;
+-- Consulta 5: Total gasto por cada cliente

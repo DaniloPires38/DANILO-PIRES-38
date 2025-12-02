@@ -9,3 +9,4 @@ WHERE idProduto = 105;
 -- DELETE 3: Remover um Item de Venda específico (ex: Venda 2, Produto 104)
 DELETE FROM ItemVenda
 WHERE idVenda = 2 AND idProduto = 104;
+-- DELETE 4: Remover todas as Vendas antes de 2023-01-01
