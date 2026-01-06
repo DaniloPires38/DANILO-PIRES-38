@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rei da Moda - Gestão de Vendas</title>
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary: #1a1a1a;
+            --accent: #d4af37;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --bg: #f4f4f9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg); display: flex; min-height: 100vh; }
+
+        /* Menu Lateral */
+        aside {
+            width: var(--sidebar-width);
+            background: var(--primary);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .logo { padding: 30px 20px; text-align: center; font-size: 1.5rem; color: var(--accent); font-weight: bold; border-bottom: 1px solid #333; }
+        nav { flex: 1; padding: 20px 0; }
+        .nav-item { padding: 15px 25px; display: block; color: #bbb; text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: #252525; color: var(--accent); border-left: 5px solid var(--accent); }
+
+        main { margin-left: var(--sidebar-width); flex: 1; padding: 40px; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
+        
+        .flex-row { display: flex; gap: 10px; align-items: flex-end; }
+        button { padding: 12px 20px; border: none; border-radius: 5px; background: var(--primary); color: white; cursor: pointer; font-weight: bold; }
+        .btn-add { background: var(--success); }
+        .btn-outline { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 5px 10px; font-size: 0.8rem; }
+        .btn-finalizar { background: var(--accent); color: black; width: 100%; margin-top: 20px; font-size: 1.2rem; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f8f8; color: #666; font-size: 0.85rem; }
+
+        .carrinho-container { margin-top: 30px; border-top: 2px dashed #ddd; padding-top: 20px; }
+        .total-venda { text-align: right; font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-top: 10px; }
+
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: white; padding: 20px; border-radius: 10px; text-align: center; border-top: 4px solid var(--accent); }
+    </style>
+</head>
+<body>
+
+<aside>
+    <div class="logo">REI DA MODA 👑</div>
+    <nav>
+        <div class="nav-item active" onclick="showTab('tab-estoque', this)">📦 Estoque</div>
+        <div class="nav-item" onclick="showTab('tab-compras', this)">🛒 Compras</div>
+        <div class="nav-item" onclick="showTab('tab-vendas', this)">💰 Vendas</div>
+        <div class="nav-item" onclick="showTab('tab-relatorios', this)">📊 Relatórios</div>
+    </nav>
+</aside>
+
+<main>
+    <section id="tab-estoque" class="content">
+        <div class="card">
+            <h2>📦 Estoque Atual</h2>
+            <table id="tbl-estoque">
+                <thead>
+                    <tr><th>Produto</th><th>Qtd</th><th>Custo</th><th>Sugerido</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="tab-compras" class="content" style="display:none">
+        <div class="card">
+            <h2>🛒 Entrada de Mercadoria</h2>
+            <div class="form-group"><label>Nome do Produto</label><input type="text" id="c-nome" placeholder="Ex: Camiseta de Time Manga Longa"></div>
+            <div class="form-group"><label>Quantidade</label><input type="number" id="c-qtd"></div>
+            <div class="form-group"><label>Custo Unitário (R$)</label><input type="number" id="c-custo" step="0.01"></div>
+            <button class="btn-add" onclick="registrarCompra()">Salvar no Estoque</button>
+        </div>
+    </section>
+
+    <section id="tab-vendas" class="content" style="display:none">
+        <div class="card">
+            <h2>💰 Nova Venda</h2>
+            <div class="flex-row">
+                <div class="form-group" style="flex: 2;">
+                    <label>Produto</label>
+                    <select id="v-select" onchange="sugerirPreco()"></select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Qtd</label>
+                    <input type="number" id="v-qtd" value="1">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Preço Unit.</label>
+                    <input type="number" id="v-preco" step="0.01">
+                </div>
+                <div class="form-group">
+                    <button class="btn-add" onclick="adicionarAoCarrinho()">+ Adicionar</button>
+                </div>
+            </div>
+
+            <div class="carrinho-container">
+                <h3>🛒 Carrinho de Venda</h3>
+                <table id="tbl-carrinho">
+                    <thead>
+                        <tr><th>Produto</th><th>Qtd</th><th>Unidade</th><th>Subtotal</th><th>Ação</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="total-venda">Total: R$ <span id="total-carrinho">0,00</span></div>
+                <button class="btn-finalizar" onclick="finalizarVenda()">FINALIZAR VENDA COMPLETA</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="tab-relatorios" class="content" style="display:none">
+        <div class="grid-stats">
+            <div class="stat-box"><small>FATURAMENTO HOJE</small><h3 id="r-hoje">R$ 0,00</h3></div>
+            <div class="stat-box"><small>ESTA SEMANA</small><h3 id="r-semana">R$ 0,00</h3></div>
+            <div class="stat-box"><small>ESTE MÊS</small><h3 id="r-mes">R$ 0,00</h3></div>
+        </div>
+        <div class="card">
+            <h2>📊 Histórico Recente</h2>
+            <table id="tbl-vendas">
+                <thead><tr><th>Data</th><th>Produtos</th><th>Valor Total</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+    let db = JSON.parse(localStorage.getItem('rei_da_moda_v7')) || { estoque: [], vendas: [] };
+    let carrinho = [];
+
+    function salvar() {
+        localStorage.setItem('rei_da_moda_v7', JSON.stringify(db));
+        atualizarTudo();
+    }
+
+    function showTab(id, el) {
+        document.querySelectorAll('.content').forEach(s => s.style.display = 'none');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).style.display = 'block';
+        el.classList.add('active');
+    }
+
+    // --- REGRAS DE PRECIFICAÇÃO ATUALIZADAS ---
+    function obterMargemLucro(nome) {
+        const n = nome.toUpperCase();
+        if (n.includes("CAMISETA DE TIME MANGA LONGA")) return 2.00; // +100%
+        if (n.includes("CAMISETA DE BASQUETE")) return 1.60;       // +60%
+        if (n.includes("CAMISETA DE TIME PREMIUN")) return 1.75;    // +75%
+        if (n.includes("CAMISETA DE TIME JUVENIL")) return 1.94;    // +94%
+        if (n.includes("CAMISETA DE TIME")) return 1.75;            // +75%
+        if (n.includes("CALÇA JENAS")) return 1.50;                // +50%
+        if (n.includes("CAMISETA PERUANA")) return 2.00;           // +100%
+        return 1.60; 
+    }
+
+    function registrarCompra() {
+        const inputNome = document.getElementById('c-nome');
+        const inputQtd = document.getElementById('c-qtd');
+        const inputCusto = document.getElementById('c-custo');
+
+        if(!inputNome.value || isNaN(inputQtd.value)) return alert("Preencha corretamente!");
+
+        let item = db.estoque.find(i => i.nome.toLowerCase() === inputNome.value.toLowerCase());
+        if(item) { 
+            item.qtd += parseInt(inputQtd.value); 
+            item.custo = parseFloat(inputCusto.value); 
+        } else { 
+            db.estoque.push({ nome: inputNome.value, qtd: parseInt(inputQtd.value), custo: parseFloat(inputCusto.value) }); 
+        }
+
+        salvar();
+        inputNome.value = ""; inputQtd.value = ""; inputCusto.value = "";
+        inputNome.focus();
+        alert("Entrada registrada!");
+    }
+
+    function sugerirPreco() {
+        const index = document.getElementById('v-select').value;
+        if(index === "") return;
+        const item = db.estoque[index];
+        document.getElementById('v-preco').value = (item.custo * obterMargemLucro(item.nome)).toFixed(2);
+    }
+
+    function adicionarAoCarrinho() {
+        const selectProd = document.getElementById('v-select');
+        const inputQtd = document.getElementById('v-qtd');
+        const inputPreco = document.getElementById('v-preco');
+        
+        const idx = selectProd.value;
+        const qtd = parseInt(inputQtd.value);
+        const preco = parseFloat(inputPreco.value);
+
+        if(idx === "" || isNaN(qtd)) return alert("Selecione um produto!");
+        
+        const itemEstoque = db.estoque[idx];
+        const itemNoCarrinho = carrinho.find(c => c.indexEstoque == idx);
+        
+        if(itemEstoque.qtd < (itemNoCarrinho ? itemNoCarrinho.qtd + qtd : qtd)) {
+            return alert("Estoque insuficiente!");
+        }
+
+        if(itemNoCarrinho) {
+            itemNoCarrinho.qtd += qtd;
+            itemNoCarrinho.subtotal = itemNoCarrinho.qtd * preco;
+        } else {
+            carrinho.push({
+                indexEstoque: idx,
+                nome: itemEstoque.nome,
+                qtd: qtd,
+                precoUnit: preco,
+                subtotal: qtd * preco
+            });
+        }
+
+        // LIMPAR CAMPOS APÓS INSERIR NO CARRINHO
+        selectProd.value = "";
+        inputQtd.value = "1";
+        inputPreco.value = "";
+
+        renderCarrinho();
+    }
+
+    function removerDoCarrinho(i) {
+        carrinho.splice(i, 1);
+        renderCarrinho();
+    }
+
+    function renderCarrinho() {
+        const tbody = document.querySelector('#tbl-carrinho tbody');
+        tbody.innerHTML = "";
+        let total = 0;
+
+        carrinho.forEach((item, i) => {
+            total += item.subtotal;
+            tbody.innerHTML += `<tr>
+                <td>${item.nome}</td>
+                <td>${item.qtd}</td>
+                <td>R$ ${item.precoUnit.toFixed(2)}</td>
+                <td>R$ ${item.subtotal.toFixed(2)}</td>
+                <td><button class="btn-outline" onclick="removerDoCarrinho(${i})">Remover</button></td>
+            </tr>`;
+        });
+        document.getElementById('total-carrinho').innerText = total.toFixed(2);
+    }
+
+    function finalizarVenda() {
+        if(carrinho.length === 0) return alert("Carrinho vazio!");
+
+        let nomesLista = [];
+        let somaVenda = 0;
+
+        carrinho.forEach(item => {
+            db.estoque[item.indexEstoque].qtd -= item.qtd;
+            nomesLista.push(`${item.qtd}x ${item.nome}`);
+            somaVenda += item.subtotal;
+        });
+
+        db.vendas.push({
+            itens: nomesLista.join(", "),
+            total: somaVenda,
+            data: new Date().getTime()
+        });
+
+        carrinho = [];
+        salvar();
+        renderCarrinho();
+        alert("Venda enviada para o relatório!");
+    }
+
+    function atualizarTudo() {
+        // Tabela Estoque
+        const tbodyEst = document.querySelector('#tbl-estoque tbody');
+        const selectV = document.getElementById('v-select');
+        tbodyEst.innerHTML = "";
+        selectV.innerHTML = '<option value="">Selecione o produto...</option>';
+
+        db.estoque.forEach((item, i) => {
+            const margem = obterMargemLucro(item.nome);
+            tbodyEst.innerHTML += `<tr>
+                <td>${item.nome}</td>
+                <td>${item.qtd}</td>
+                <td>R$ ${item.custo.toFixed(2)}</td>
+                <td style="color: var(--success); font-weight: bold;">R$ ${(item.custo * margem).toFixed(2)}</td>
+            </tr>`;
+            if(item.qtd > 0) selectV.innerHTML += `<option value="${i}">${item.nome} (${item.qtd})</option>`;
+        });
+
+        // Relatórios Diário, Semanal e Mensal
+        const agora = new Date();
+        let hoje = 0, semana = 0, mes = 0;
+        const tbodyVend = document.querySelector('#tbl-vendas tbody');
+        tbodyVend.innerHTML = "";
+
+        db.vendas.slice().reverse().forEach(v => {
+            const dv = new Date(v.data);
+            const diffDias = (agora - dv) / (1000 * 60 * 60 * 24);
+
+            // Hoje
+            if(dv.toDateString() === agora.toDateString()) hoje += v.total;
+            // Semana (últimos 7 dias)
+            if(diffDias <= 7) semana += v.total;
+            // Mês (mesmo mês e ano)
+            if(dv.getMonth() === agora.getMonth() && dv.getFullYear() === agora.getFullYear()) mes += v.total;
+
+            tbodyVend.innerHTML += `<tr>
+                <td>${dv.toLocaleDateString()}</td>
+                <td style="font-size: 0.8rem; color: #555;">${v.itens}</td>
+                <td><b>R$ ${v.total.toFixed(2)}</b></td>
+            </tr>`;
+        });
+
+        document.getElementById('r-hoje').innerText = `R$ ${hoje.toFixed(2)}`;
+        document.getElementById('r-semana').innerText = `R$ ${semana.toFixed(2)}`;
+        document.getElementById('r-mes').innerText = `R$ ${mes.toFixed(2)}`;
+    }
+
+    atualizarTudo();
+</script>
+</body>
+</html>
